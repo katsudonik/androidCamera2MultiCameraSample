@@ -285,21 +285,24 @@ public class Camera2StateMachine {
 	// -----------------------------------------------------------------------------------
 	private final State mTakePictureState = new State("TakePicture") {
 		public void enter() throws CameraAccessException {
-			String cameraId = Camera2Util.getCameraId(mCameraManager, CameraCharacteristics.LENS_FACING_BACK);
-			CameraCharacteristics characteristics = mCameraManager.getCameraCharacteristics(cameraId);
 
-			Set physicalCameraIdSet = characteristics.getPhysicalCameraIds();
+			String[] idList = mCameraManager.getCameraIdList();
+			for (String cameraId : idList) {
+				CameraCharacteristics characteristics = mCameraManager.getCameraCharacteristics(cameraId);
 
-			final CaptureRequest.Builder captureBuilder =
-					mCameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_STILL_CAPTURE, physicalCameraIdSet);
-			captureBuilder.addTarget(mImageReader.getSurface());
-			captureBuilder.set(CaptureRequest.CONTROL_AF_MODE, CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE);
-			captureBuilder.set(CaptureRequest.CONTROL_AE_MODE, CaptureRequest.CONTROL_AE_MODE_ON_AUTO_FLASH);
-			captureBuilder.set(CaptureRequest.JPEG_ORIENTATION, 90); // portraito
-			mImageReader.setOnImageAvailableListener(mTakePictureListener, mHandler);
+				Set<String> physicalCameraIdSet = characteristics.getPhysicalCameraIds();
 
-			mCaptureSession.stopRepeating();
-			mCaptureSession.capture(captureBuilder.build(), mCaptureCallback, mHandler);
+				final CaptureRequest.Builder captureBuilder =
+						mCameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_STILL_CAPTURE, physicalCameraIdSet);
+				captureBuilder.addTarget(mImageReader.getSurface());
+				captureBuilder.set(CaptureRequest.CONTROL_AF_MODE, CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE);
+				captureBuilder.set(CaptureRequest.CONTROL_AE_MODE, CaptureRequest.CONTROL_AE_MODE_ON_AUTO_FLASH);
+				captureBuilder.set(CaptureRequest.JPEG_ORIENTATION, 90); // portraito
+				mImageReader.setOnImageAvailableListener(mTakePictureListener, mHandler);
+
+				mCaptureSession.stopRepeating();
+				mCaptureSession.capture(captureBuilder.build(), mCaptureCallback, mHandler);
+			}
 		}
 		public void onCaptureResult(CaptureResult result, boolean isCompleted) throws CameraAccessException {
 			if (isCompleted) {
