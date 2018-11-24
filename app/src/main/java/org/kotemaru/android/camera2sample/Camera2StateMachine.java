@@ -3,9 +3,13 @@ package org.kotemaru.android.camera2sample;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
+import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.graphics.ImageFormat;
 import android.graphics.SurfaceTexture;
 import android.hardware.camera2.CameraAccessException;
@@ -45,12 +49,15 @@ public class Camera2StateMachine {
 		mCameraManager = (CameraManager) activity.getSystemService(Context.CAMERA_SERVICE);
 		nextState(mInitSurfaceState);
 	}
+
 	public boolean takePicture(ImageReader.OnImageAvailableListener listener) {
 		if (mState != mPreviewState) return false;
 		mTakePictureListener = listener;
-		nextState(mAutoFocusState);
+//		nextState(mAutoFocusState);
+		nextState(mTakePictureState);
 		return true;
 	}
+
 	public void close() {
 		nextState(mAbortState);
 	}
@@ -90,15 +97,30 @@ public class Camera2StateMachine {
 		public State(String name) {
 			mName = name;
 		}
+
 		//@formatter:off
-		public String toString() {return mName;}
-		public void enter() throws CameraAccessException {}
-		public void onSurfaceTextureAvailable(int width, int height){}
-		public void onCameraOpened(CameraDevice cameraDevice){}
-		public void onSessionConfigured(CameraCaptureSession cameraCaptureSession) {}
-		public void onCaptureResult(CaptureResult result, boolean isCompleted) throws CameraAccessException {}
-		public void finish() throws CameraAccessException {}
-        //@formatter:on
+		public String toString() {
+			return mName;
+		}
+
+		public void enter() throws CameraAccessException {
+		}
+
+		public void onSurfaceTextureAvailable(int width, int height) {
+		}
+
+		public void onCameraOpened(CameraDevice cameraDevice) {
+		}
+
+		public void onSessionConfigured(CameraCaptureSession cameraCaptureSession) {
+		}
+
+		public void onCaptureResult(CaptureResult result, boolean isCompleted) throws CameraAccessException {
+		}
+
+		public void finish() throws CameraAccessException {
+		}
+		//@formatter:on
 	}
 
 	// ===================================================================================
@@ -111,6 +133,7 @@ public class Camera2StateMachine {
 				mTextureView.setSurfaceTextureListener(mSurfaceTextureListener);
 			}
 		}
+
 		public void onSurfaceTextureAvailable(int width, int height) {
 			nextState(mOpenCameraState);
 		}
@@ -120,14 +143,17 @@ public class Camera2StateMachine {
 			public void onSurfaceTextureAvailable(SurfaceTexture texture, int width, int height) {
 				if (mState != null) mState.onSurfaceTextureAvailable(width, height);
 			}
+
 			@Override
 			public void onSurfaceTextureSizeChanged(SurfaceTexture texture, int width, int height) {
 				// TODO: ratation changed.
 			}
+
 			@Override
 			public boolean onSurfaceTextureDestroyed(SurfaceTexture texture) {
 				return true;
 			}
+
 			@Override
 			public void onSurfaceTextureUpdated(SurfaceTexture texture) {
 			}
@@ -139,6 +165,7 @@ public class Camera2StateMachine {
 			// configureTransform(width, height);
 			String cameraId = Camera2Util.getCameraId(mCameraManager, CameraCharacteristics.LENS_FACING_BACK);
 			CameraCharacteristics characteristics = mCameraManager.getCameraCharacteristics(cameraId);
+
 			StreamConfigurationMap map = characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
 
 			mImageReader = Camera2Util.getMaxSizeImageReader(map, ImageFormat.JPEG);
@@ -258,8 +285,13 @@ public class Camera2StateMachine {
 	// -----------------------------------------------------------------------------------
 	private final State mTakePictureState = new State("TakePicture") {
 		public void enter() throws CameraAccessException {
+			String cameraId = Camera2Util.getCameraId(mCameraManager, CameraCharacteristics.LENS_FACING_BACK);
+			CameraCharacteristics characteristics = mCameraManager.getCameraCharacteristics(cameraId);
+
+			Set physicalCameraIdSet = characteristics.getPhysicalCameraIds();
+
 			final CaptureRequest.Builder captureBuilder =
-					mCameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_STILL_CAPTURE);
+					mCameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_STILL_CAPTURE, physicalCameraIdSet);
 			captureBuilder.addTarget(mImageReader.getSurface());
 			captureBuilder.set(CaptureRequest.CONTROL_AF_MODE, CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE);
 			captureBuilder.set(CaptureRequest.CONTROL_AE_MODE, CaptureRequest.CONTROL_AE_MODE_ON_AUTO_FLASH);

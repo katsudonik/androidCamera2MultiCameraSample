@@ -2,6 +2,7 @@ package org.kotemaru.android.camera2sample;
 
 import java.nio.ByteBuffer;
 
+import android.Manifest;
 import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -16,6 +17,7 @@ public class MainActivity extends Activity {
 	private AutoFitTextureView mTextureView;
 	private ImageView mImageView;
 	private Camera2StateMachine mCamera2;
+	static final int REQUEST_CODE = 1;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -25,6 +27,8 @@ public class MainActivity extends Activity {
 		mTextureView = (AutoFitTextureView) findViewById(R.id.TextureView);
 		mImageView = (ImageView) findViewById(R.id.ImageView);
 		mCamera2 = new Camera2StateMachine();
+
+		requestPermissions(new String[]{Manifest.permission.CAMERA}, REQUEST_CODE);
 	}
 
 	@Override
