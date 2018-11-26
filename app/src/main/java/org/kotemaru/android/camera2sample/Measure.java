@@ -64,13 +64,10 @@ public class Measure {
             Point[] points = new Point[4];
             best_rect.points(points);
 
-//            Mat points = new Mat();
-//            Imgproc.boxPoints(best_rect, points);
-
             List<MatOfPoint> boxContours = new ArrayList<MatOfPoint>();
             boxContours.add(new MatOfPoint(points));
 
-            Imgproc.drawContours(matImg, boxContours, 0, new Scalar(128, 128, 128), -1);
+            Imgproc.drawContours(matImg, boxContours, -1, new Scalar(0, 128, 0), 2);
         }
 
         Utils.matToBitmap(matImg, image);
