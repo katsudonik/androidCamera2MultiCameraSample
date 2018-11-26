@@ -285,10 +285,12 @@ public class Camera2StateMachine {
 	// -----------------------------------------------------------------------------------
 	private final State mTakePictureState = new State("TakePicture") {
 		public void enter() throws CameraAccessException {
+//			String cameraId = Camera2Util.getCameraId(mCameraManager, CameraCharacteristics.LENS_FACING_BACK);
 
 			String[] idList = mCameraManager.getCameraIdList();
 			for (String cameraId : idList) {
 				CameraCharacteristics characteristics = mCameraManager.getCameraCharacteristics(cameraId);
+
 
 				Set<String> physicalCameraIdSet = characteristics.getPhysicalCameraIds();
 

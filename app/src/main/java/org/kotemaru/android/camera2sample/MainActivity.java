@@ -1,9 +1,12 @@
 package org.kotemaru.android.camera2sample;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.nio.ByteBuffer;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.Image;
@@ -12,6 +15,10 @@ import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.ImageView;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class MainActivity extends Activity {
 	private AutoFitTextureView mTextureView;
@@ -61,6 +68,19 @@ public class MainActivity extends Activity {
 				buffer.get(bytes);
 				Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
 				image.close();
+
+				if(bitmap != null){
+					DateFormat df = new SimpleDateFormat("yyyyMMddHHmmss");
+					Date date = new Date(System.currentTimeMillis());
+
+					try{
+						// save into /data/data/org.kotemaru.android.camera2sample/files/
+						FileOutputStream fileStream = openFileOutput(df.format(date) + "test.jpg", Context.MODE_APPEND);
+						bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fileStream);
+					} catch (FileNotFoundException e) {
+						e.printStackTrace();
+					}
+				}
 
 				mImageView.setImageBitmap(bitmap);
 				mImageView.setVisibility(View.VISIBLE);
