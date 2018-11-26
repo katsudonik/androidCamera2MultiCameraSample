@@ -12,9 +12,12 @@ import android.graphics.BitmapFactory;
 import android.media.Image;
 import android.media.ImageReader;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.ImageView;
+
+import org.opencv.android.OpenCVLoader;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -30,6 +33,12 @@ public class MainActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+
+        if(!OpenCVLoader.initDebug()){
+            Log.i("OpenCV", "Failed");
+        }else{
+            Log.i("OpenCV", "successfully built !");
+        }
 
 		mTextureView = (AutoFitTextureView) findViewById(R.id.TextureView);
 		mImageView = (ImageView) findViewById(R.id.ImageView);
