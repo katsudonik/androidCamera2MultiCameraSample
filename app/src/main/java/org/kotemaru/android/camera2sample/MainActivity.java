@@ -2,6 +2,7 @@ package org.kotemaru.android.camera2sample;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.nio.ByteBuffer;
 
 import android.Manifest;
@@ -27,6 +28,7 @@ public class MainActivity extends Activity {
 	private AutoFitTextureView mTextureView;
 	private ImageView mImageView;
 	private Camera2StateMachine mCamera2;
+    private FaceClassifier mFace;
 	static final int REQUEST_CODE = 1;
 
 	@Override
@@ -43,6 +45,7 @@ public class MainActivity extends Activity {
 		mTextureView = (AutoFitTextureView) findViewById(R.id.TextureView);
 		mImageView = (ImageView) findViewById(R.id.ImageView);
 		mCamera2 = new Camera2StateMachine();
+        mFace = new FaceClassifier(this);
 
 		requestPermissions(new String[]{Manifest.permission.CAMERA}, REQUEST_CODE);
 	}
@@ -92,10 +95,18 @@ public class MainActivity extends Activity {
 				}
 
 				mImageView.setImageBitmap(bitmap);
-				mImageView.setVisibility(View.VISIBLE);
+
+                try {
+                    mFace.checkFaceExistence(bitmap);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                mImageView.setVisibility(View.VISIBLE);
 				mTextureView.setVisibility(View.INVISIBLE);
 			}
 		});
+
 	}
 
 }
