@@ -29,6 +29,7 @@ public class MainActivity extends Activity {
 	private ImageView mImageView;
 	private Camera2StateMachine mCamera2;
     private FaceClassifier mFace;
+    private Measure mMeasure;
 	static final int REQUEST_CODE = 1;
 
 	@Override
@@ -46,6 +47,7 @@ public class MainActivity extends Activity {
 		mImageView = (ImageView) findViewById(R.id.ImageView);
 		mCamera2 = new Camera2StateMachine();
         mFace = new FaceClassifier(this);
+        mMeasure = new Measure(this);
 
 		requestPermissions(new String[]{Manifest.permission.CAMERA}, REQUEST_CODE);
 	}
@@ -94,7 +96,6 @@ public class MainActivity extends Activity {
 					}
 				}
 
-				mImageView.setImageBitmap(bitmap);
 
                 try {
                     mFace.checkFaceExistence(bitmap);
@@ -102,6 +103,13 @@ public class MainActivity extends Activity {
                     e.printStackTrace();
                 }
 
+                try {
+                    bitmap = mMeasure.measure(bitmap);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                mImageView.setImageBitmap(bitmap);
                 mImageView.setVisibility(View.VISIBLE);
 				mTextureView.setVisibility(View.INVISIBLE);
 			}
