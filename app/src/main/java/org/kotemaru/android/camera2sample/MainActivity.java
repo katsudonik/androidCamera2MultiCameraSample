@@ -70,7 +70,7 @@ public class MainActivity extends Activity {
 				image.close();
 
 				if(bitmap != null){
-					DateFormat df = new SimpleDateFormat("yyyyMMddHHmmss");
+					DateFormat df = new SimpleDateFormat("yyyyMMddHHmmssSSSSSSSSS");
 					Date date = new Date(System.currentTimeMillis());
 
 					try{
